@@ -34,13 +34,18 @@ int main(int argc, char const *argv[])
     ifstream in = ifstream("./mario/input/input0.txt");
     ofstream out = ofstream("./mario/test/input0.txt");
 
-    /*Get the main paramiter*/
+    /*Ottenere i parametri base
+        N=numero di nodi
+        M=numero di archi
+        P=Power-up da consegnare
+    */
     int N, M, P;
     in >> N >> M >> P;
 
-    /*Init the Graph as vector*/
+    /*Inizializazione del grafo come lista concatenata*/
     vector<node> G(N);
 
+    /*Definizione del grafo orientato con conesisoni in entrabi i versi*/
     for (int i = 0, u, v; i < M; i++)
     {
         in >> u >> v;
@@ -49,6 +54,7 @@ int main(int argc, char const *argv[])
     }
     auto end = high_resolution_clock::now();
 
+    /*Print del Grafo*/
     for (int i = 0; i < G.size(); i++)
     {
         cout << i << ": ";
