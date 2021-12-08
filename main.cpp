@@ -2,13 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <queue>
-#include <chrono>
 
 using namespace std;
-using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-using std::chrono::duration;
-using std::chrono::milliseconds;
 
 struct node
 {
@@ -17,19 +12,48 @@ public:
     vector<int> v;
 };
 
-void erdos(vector<node> G, node r, int distance[])
+struct destination
 {
-    queue<node> Q;
+public:
+    unsigned int from;
+    unsigned int to;
+    destination(unsigned int from, unsigned int to){
+        destination::from = from;
+        destination::to = to;
+    }
+};
+
+
+void erdosSeachArchRemove(vector<node> G, int r, int to, vector<unsigned int> &distance)
+{
+    queue<int> Q;
     Q.push(r);
-    for (int i = 0; i < G.size(); i++)
+
+    distance.assign(distance.size(), -1);
+    distance[r] = 0;
+
+    while (!Q.empty())
     {
-        cout << G[i].v.front() << endl;
+        int u = Q.front();
+        Q.pop();
+
+        for (int j = 0; j < G[u].v.size(); j++)
+        {
+            if (distance[G[u].v[j]] == -1)
+            {
+                distance[G[u].v[j]] = distance[u] + 1;
+                Q.push(G[u].v[j]);
+                if (G[u].v[j] == to)
+                {
+                    return;   
+                }
+            }
+        }
     }
 }
 
 int main(int argc, char const *argv[])
 {
-    auto start = high_resolution_clock::now();
     /*Read file*/
     ifstream in = ifstream("./mario/input/input0.txt");
     ofstream out = ofstream("./mario/test/input0.txt");
@@ -44,6 +68,7 @@ int main(int argc, char const *argv[])
 
     /*Inizializazione del grafo come lista concatenata*/
     vector<node> G(N);
+    vector<unsigned int> distance(N, -1);
 
     /*Definizione del grafo orientato con conesisoni in entrabi i versi*/
     for (int i = 0, u, v; i < M; i++)
@@ -52,23 +77,41 @@ int main(int argc, char const *argv[])
         G[u].v.push_back(v);
         G[v].v.push_back(u);
     }
-    auto end = high_resolution_clock::now();
+
+    /*Inizializazione dei Power-up*/
+    vector<destination> powerUpTrape;
+
+    /*Definizione dei power-up da trasportare presi dal file*/
+    for (int i = 0, u, v; i < P; i++)
+    {
+        in >> u >> v;
+        powerUpTrape.push_back(destination(u,v));
+    }
+    
+    for (int i = 0; i < P; i++)
+    {
+        cout << powerUpTrape[i].from << ' ' << powerUpTrape[i].to << endl;
+    }
+    
+
+    erdosSeachArchRemove(G, 0, 2, distance);
+
+    // for (int i = 0; i < N; i++)
+    // {
+    //     cout << distance[i] << ' ';
+    // }
+    // cout << endl;
 
     /*Print del Grafo*/
-    for (int i = 0; i < G.size(); i++)
-    {
-        cout << i << ": ";
-        for (int j = 0; j < G[i].v.size(); j++)
-        {
-            cout << G[i].v[j] << ' ';
-        }
-        cout << endl;
-    }
-
-    duration<double, milli> ms_double = end - start;
-
-    cout << ms_double.count() << "ms\n";
-    
+    // for (int i = 0; i < G.size(); i++)
+    // {
+    //     cout << i << ": ";
+    //     for (int j = 0; j < G[i].v.size(); j++)
+    //     {
+    //         cout << G[i].v[j] << ' ';
+    //     }
+    //     cout << endl;
+    // }
 
     return 0;
 }
